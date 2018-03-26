@@ -4,7 +4,7 @@ import { URL } from '../../../../config';
 import styles from '../../articles.css';
 import Header from './Header';
 
-class NewsArticles extends Component {
+class NewsArticle extends Component {
   state = {
     article: [],
     team: []
@@ -16,7 +16,7 @@ class NewsArticles extends Component {
       .then(response => {
         let article = response.data[0];
         axios
-          .get(`${URL}/teams?id${article.team}`)
+          .get(`${URL}/teams?id=${article.team}`)
           .then(response => this.setState({ article, team: response.data }));
       });
   }
@@ -44,4 +44,4 @@ class NewsArticles extends Component {
   }
 }
 
-export default NewsArticles;
+export default NewsArticle;
