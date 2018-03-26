@@ -3,6 +3,7 @@ import { Route, Switch } from 'react-router-dom';
 
 import Layout from './hoc/Layout/Layout';
 import Home from './components/Home/Home';
+import NewsArticle from './components/Articles/News/Post';
 
 class Routes extends Component {
   render() {
@@ -10,6 +11,7 @@ class Routes extends Component {
       <Layout>
         <Switch>
           <Route path="/" exact component={Home} />
+          <Route path="/articles/:id" exact component={NewsArticle} />
         </Switch>
       </Layout>
     );

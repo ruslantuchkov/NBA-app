@@ -8,7 +8,7 @@ const SideNavItems = () => {
     {
       type: style.option,
       icon: 'home',
-      text: 'home',
+      text: 'Home',
       link: '/'
     },
     {
