@@ -12,7 +12,7 @@ const Home = () => {
         amount={3}
         settings={{ dots: false }}
       />
-      <NewsList type="card" loadmore={true} start={3} amount={3} />
+      <NewsList type="card" loadmore={true} start={4} amount={3} />
       <VideosList
         type="card"
         loadmore={true}
