@@ -1,53 +1,95 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import FontAwesome from 'react-fontawesome';
-import style from './sideNav.css';
+import { firebase } from '../../../firebase';
+import styles from './sideNav.css';
 
-const SideNavItems = () => {
+const SideNavItems = props => {
   const items = [
     {
-      type: style.option,
+      type: styles.option,
       icon: 'home',
       text: 'Home',
-      link: '/'
+      link: '/',
+      login: ''
     },
     {
-      type: style.option,
+      type: styles.option,
       icon: 'file-text-o',
       text: 'News',
-      link: '/news'
+      link: '/news',
+      login: ''
     },
     {
-      type: style.option,
+      type: styles.option,
       icon: 'play',
       text: 'Videos',
-      link: '/videos'
+      link: '/videos',
+      login: ''
     },
     {
-      type: style.option,
+      type: styles.option,
       icon: 'sign-in',
       text: 'Sign in',
-      link: '/sign-in'
+      link: '/sign-in',
+      login: false
     },
     {
-      type: style.option,
+      type: styles.option,
       icon: 'sign-out',
       text: 'Sign out',
-      link: '/sign-out'
+      link: '/sign-out',
+      login: true
     }
   ];
 
+  const element = (item, i) => (
+    <Link to={item.link} key={i}>
+      <div className={item.type}>
+        <FontAwesome name={item.icon} />
+        {item.text}
+      </div>
+    </Link>
+  );
+
+  const restricted = (item, i) => {
+    let template = null;
+
+    if (props.user === null && !item.login) {
+      template = element(item, i);
+    }
+
+    if (props.user !== null && item.login) {
+      if (item.link === '/sign-out') {
+        template = (
+          <div
+            className={item.type}
+            key={i}
+            onClick={() => {
+              firebase
+                .auth()
+                .signOut()
+                .then(() => props.history.push('/'));
+            }}
+          >
+            <FontAwesome name={item.icon} />
+            {item.text}
+          </div>
+        );
+      } else {
+        template = element(item, i);
+      }
+    }
+
+    return template;
+  };
+
   const showItems = () =>
-    items.map(({ type, icon, text, link }, i) => (
-      <Link to={link} key={i}>
-        <div className={type}>
-          <FontAwesome name={icon} />
-          {text}
-        </div>
-      </Link>
-    ));
+    items.map(
+      (item, i) => (item.login !== '' ? restricted(item, i) : element(item, i))
+    );
 
   return <div>{showItems()}</div>;
 };
 
-export default SideNavItems;
+export default withRouter(SideNavItems);
