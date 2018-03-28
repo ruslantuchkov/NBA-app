@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
+
 import { firebaseTeams } from '../../firebase';
-import FormField from '../widgets/FormFields/FormFields';
 import styles from './dashboard.css';
 
+import FormField from '../widgets/FormFields/FormFields';
+import Uploader from '../widgets/FileUploader/FileUploader';
+
 import { Editor } from 'react-draft-wysiwyg';
-import { EditorState, convertFromRaw, convertToRaw } from 'draft-js';
+import { EditorState } from 'draft-js';
 import { stateToHTML } from 'draft-js-export-html';
 
 class Dashboard extends Component {
@@ -48,11 +51,11 @@ class Dashboard extends Component {
         value: '',
         valid: true
       },
-      teams: {
+      team: {
         element: 'select',
         value: '',
         config: {
-          name: 'teams_input',
+          name: 'team_input',
           options: []
         },
         validation: {
@@ -61,6 +64,11 @@ class Dashboard extends Component {
         valid: false,
         touched: false,
         validationMessage: ''
+      },
+      image: {
+        element: 'image',
+        value: '',
+        valid: true
       }
     }
   };
@@ -84,11 +92,11 @@ class Dashboard extends Component {
         ...this.state.formData
       };
       const newElement = {
-        ...newFormData['teams']
+        ...newFormData['team']
       };
       newElement.config.options = teams;
 
-      newFormData['teams'] = newElement;
+      newFormData['team'] = newElement;
 
       this.setState({ formData: newFormData });
     });
@@ -191,11 +199,18 @@ class Dashboard extends Component {
     this.setState({ editorState });
   };
 
+  storeFilename = fileName => {
+    this.updateForm({ id: 'image' }, fileName);
+  };
+
   render() {
     return (
       <div className={styles.postContainer}>
         <form onSubmit={this.submitForm}>
           <h2>Add Post</h2>
+
+          <Uploader storeFilename={this.storeFilename} />
+
           <FormField
             id={'author'}
             formData={this.state.formData.author}
@@ -216,8 +231,8 @@ class Dashboard extends Component {
           />
 
           <FormField
-            id={'teams'}
-            formData={this.state.formData.teams}
+            id={'team'}
+            formData={this.state.formData.team}
             change={elem => this.updateForm(elem)}
           />
           {this.submitButton()}
