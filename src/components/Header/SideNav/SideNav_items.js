@@ -30,6 +30,13 @@ const SideNavItems = props => {
     {
       type: styles.option,
       icon: 'sign-in',
+      text: 'Dashboard',
+      link: '/dashboard',
+      login: true
+    },
+    {
+      type: styles.option,
+      icon: 'sign-in',
       text: 'Sign in',
       link: '/sign-in',
       login: false
