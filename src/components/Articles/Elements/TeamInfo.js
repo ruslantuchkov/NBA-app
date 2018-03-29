@@ -16,7 +16,8 @@ const TeamInfo = ({ team }) => {
         </div>
         <div>
           <strong>
-            W{team.stats[0].wins}-L{team.stats[0].defeats}
+            W{team.stats && team.stats[0].wins}-L{team.stats &&
+              team.stats[0].defeats}
           </strong>
         </div>
       </div>

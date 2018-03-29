@@ -11,7 +11,7 @@ const NewsMain = () => {
         amount={3}
         settings={{ dots: false }}
       />
-      <NewsList type="cardMain" loadmore={true} start={3} amount={10} />
+      <NewsList type="cardMain" loadmore={true} start={4} amount={10} />
     </div>
   );
 };

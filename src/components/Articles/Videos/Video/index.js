@@ -11,34 +11,35 @@ import VideosRelated from '../../../widgets/VideosList/VideosRelated/VideosRelat
 
 class VideoArticle extends Component {
   state = {
-    article: [],
-    team: [],
+    article: {},
+    team: {},
     teams: [],
     related: []
   };
 
   componentDidMount() {
-    this.loadData();
+    this.loadData(this.props.match.params.id);
   }
 
-  componentDidUpdate() {
-    if (+this.props.match.params.id !== this.state.article.id) {
-      this.loadData();
+  componentWillReceiveProps(update) {
+    if (update.match.params.id !== this.state.article.id) {
+      this.loadData(update.match.params.id);
     }
   }
 
-  loadData = () => {
+  loadData = id => {
     firebaseDB
-      .ref(`videos/${this.props.match.params.id}`)
+      .ref(`videos/${id}`)
       .once('value')
       .then(snapshot => {
         let video = snapshot.val();
+        video.id = snapshot.key;
         firebaseTeams
           .orderByChild('id')
           .equalTo(video.team)
           .once('value')
           .then(snapshot => {
-            const team = firebaseLooper(snapshot);
+            const team = firebaseLooper(snapshot)[0];
             this.setState({ article: video, team });
             this.getRelated();
           });
@@ -63,10 +64,12 @@ class VideoArticle extends Component {
       firebaseVideos
         .orderByChild('team')
         .equalTo(this.state.article.team)
-        .limitToFirst(3)
+        .limitToFirst(4)
         .once('value')
         .then(snapshot => {
-          const related = firebaseLooper(snapshot);
+          const related = firebaseLooper(snapshot).filter(
+            ({ id }) => id !== this.state.article.id
+          );
           this.setState({ teams, related });
         });
     });
@@ -83,7 +86,7 @@ class VideoArticle extends Component {
     const { article, team, related, teams } = this.state;
     return (
       <div>
-        <Header teamData={team[0]} />
+        <Header teamData={team} />
         <div className={styles.videoWrapper}>
           <h1>{article.title}</h1>
           <iframe

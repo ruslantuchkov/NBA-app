@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom';
 import {
   firebaseTeams,
   firebaseArticles,
-  firebaseLooper
+  firebaseLooper,
+  firebase
 } from '../../../firebase';
 import styles from './newsList.css';
 import Button from '../Buttons/Buttons';
@@ -42,7 +43,28 @@ class NewsList extends Component {
       .once('value')
       .then(snapshot => {
         const articles = firebaseLooper(snapshot);
-        this.setState({ items: [...this.state.items, ...articles], end });
+
+        const asyncFunc = (item, i, cb) => {
+          firebase
+            .storage()
+            .ref('images')
+            .child(item.image)
+            .getDownloadURL()
+            .then(url => {
+              articles[i].image = url;
+              cb();
+            });
+        };
+
+        let requests = articles.map((item, i) => {
+          return new Promise(resolve => {
+            asyncFunc(item, i, resolve);
+          });
+        });
+
+        Promise.all(requests).then(() =>
+          this.setState({ items: [...this.state.items, ...articles], end })
+        );
       });
     // axios
     //   .get(`${URL}/articles?_start=${start}&_end=${end}`)
@@ -94,7 +116,7 @@ class NewsList extends Component {
               <div className={styles.flex_wrapper}>
                 <div
                   className={styles.left}
-                  style={{ background: `url(/images/articles/${image})` }}
+                  style={{ background: `url(${image})` }}
                 >
                   <div />
                 </div>

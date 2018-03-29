@@ -5,7 +5,7 @@ import styles from './cardInfo.css';
 
 const CardInfo = ({ date, teams, team }) => {
   const teamName = (teams, team) => {
-    let data = teams.find(({ id }) => +id === team - 1);
+    let data = teams.find(({ teamId }) => teamId === team);
     if (data) return data.name;
   };
 
