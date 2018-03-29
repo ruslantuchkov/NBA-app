@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { firebaseArticles, firebaseLooper } from '../../../firebase';
+import { firebase, firebaseArticles, firebaseLooper } from '../../../firebase';
 import SliderTemplates from './Slider_templates';
 
 class NewsSlider extends Component {
@@ -13,7 +13,38 @@ class NewsSlider extends Component {
       .once('value')
       .then(snapshot => {
         const news = firebaseLooper(snapshot);
-        this.setState({ news });
+
+        // news.forEach((item, i) => {
+        //   firebase
+        //     .storage()
+        //     .ref('images')
+        //     .child(item.image)
+        //     .getDownloadURL()
+        //     .then(url => {
+        //       news[i].image = url;
+        //       this.setState({ news });
+        //     });
+        // });
+
+        const asyncFunc = (item, i, cb) => {
+          firebase
+            .storage()
+            .ref('images')
+            .child(item.image)
+            .getDownloadURL()
+            .then(url => {
+              news[i].image = url;
+              cb();
+            });
+        };
+
+        let requests = news.map((item, i) => {
+          return new Promise(resolve => {
+            asyncFunc(item, i, resolve);
+          });
+        });
+
+        Promise.all(requests).then(() => this.setState({ news }));
       });
 
     // axios

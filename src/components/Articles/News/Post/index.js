@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import {
   firebaseDB,
   firebaseLooper,
-  firebaseTeams
+  firebaseTeams,
+  firebase
 } from '../../../../firebase';
 import styles from '../../articles.css';
 import Header from './Header';
@@ -10,7 +11,8 @@ import Header from './Header';
 class NewsArticle extends Component {
   state = {
     article: [],
-    team: []
+    team: [],
+    imageURL: ''
   };
 
   componentDidMount() {
@@ -26,6 +28,7 @@ class NewsArticle extends Component {
           .then(snapshot => {
             const team = firebaseLooper(snapshot);
             this.setState({ article, team });
+            this.getImageURL(article.image);
           });
       });
 
@@ -39,9 +42,17 @@ class NewsArticle extends Component {
     //   });
   }
 
-  render() {
-    const { article, team } = this.state;
+  getImageURL = fileName => {
+    firebase
+      .storage()
+      .ref('images')
+      .child(fileName)
+      .getDownloadURL()
+      .then(imageURL => this.setState({ imageURL }));
+  };
 
+  render() {
+    const { article, team, imageURL } = this.state;
     return (
       <div className={styles.article_wrapper}>
         <Header
@@ -53,9 +64,12 @@ class NewsArticle extends Component {
           <h1>{article.title}</h1>
           <div
             className={styles.articleImage}
-            style={{ background: `url(/images/articles/${article.image})` }}
+            style={{ background: `url(${imageURL})` }}
           />
-          <div className={styles.articleText}>{article.body}</div>
+          <div
+            className={styles.articleText}
+            dangerouslySetInnerHTML={{ __html: article.body }}
+          />
         </div>
       </div>
     );
